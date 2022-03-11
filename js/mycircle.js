@@ -20,9 +20,10 @@ class mycircle
     updateCircle()
     {
         this.x -= this.speed;
-        if(this.x <= 0)
-        {
-            this.x = this.w + 100;
-        }
+    }
+
+    getX()
+    {
+        return this.x;
     }
 }

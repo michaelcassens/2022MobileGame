@@ -1,14 +1,22 @@
 var stars = [];
 var character;
+var enemy;
 function preload()
 {
 	
+}
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
 }
 
 function setup()
 {
 	createCanvas(displayWidth, displayHeight);
 	character = createSprite(100,400);
+	enemy = createSprite(displayWidth+100, displayHeight/2);
+	enemy.addAnimation("run","./assets/enemy/sprite_0.png", "./assets/enemy/sprite_3.png");
+	enemy.scale+=.5;
 	character.addAnimation("run","./assets/character/sprite_0.png", "./assets/character/sprite_5.png");
 }
 
@@ -23,6 +31,10 @@ function draw(){
 	{
 		stars[i].updateCircle();
 		stars[i].drawCircle();
+		if(stars[i].getX() <=0)
+		{
+			stars.splice(i,1);
+		}
 	}
 	if(keyIsPressed)
 	{
@@ -59,6 +71,9 @@ function draw(){
 			character.velocity.x = 0;
 			character.velocity.y = 0;
 		}
+	
+	enemy.changeAnimation("run");
+	enemy.velocity.x -=.01;
 	
     character.changeAnimation("run");
 
