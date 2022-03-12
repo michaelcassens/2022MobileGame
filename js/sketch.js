@@ -76,7 +76,7 @@ function mousePressed() {
 	else if(mouseY <= windowHeight && mouseY > windowHeight-100)
 	{
 		console.log(character.position.y)
-		//character.velocity.y -=10;
+		
 		if(character.position.y >= 200)
 		{
 			character.velocity.y -=10;
