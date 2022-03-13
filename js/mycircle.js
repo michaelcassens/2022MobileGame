@@ -20,6 +20,7 @@ class mycircle
     updateCircle()
     {
         this.x -= this.speed;
+     
     }
 
     getX()
