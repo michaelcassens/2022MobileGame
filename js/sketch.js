@@ -33,6 +33,7 @@ function setup() {
 	enemy = createSprite(myWidth + 10, random(myHeight / 2, myHeight - 67));
 	enemy.addAnimation("run", "./assets/enemy/sprite_0.png", "./assets/enemy/sprite_3.png");
 	enemy.scale += .5;
+	character.scale += .5;
 	enemies.push(enemy);
 	enemySpeeds.push(random(1, 5));
 	enemySpeedsX.push(random(-3,1));
@@ -65,10 +66,10 @@ function draw() {
 
 	rect(0, myHeight - 50, myWidth, 50);
 
-	var hit = collideRectRect(0, myHeight - 50, myWidth, 50, character.position.x, character.position.y, 32, 17);
+	var hit = collideRectRect(0, myHeight - 50, myWidth, 50, character.position.x, character.position.y, 32, 32);
 	if (hit) {
 		character.velocity.y = 0;
-		character.position.y = myHeight - 67;
+		character.position.y = myHeight - 75;
 	} else {
 		if (!isGameOver)
 			character.velocity.y = 1;
