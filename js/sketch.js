@@ -1,6 +1,8 @@
 var stars = [];
 var character;
 var enemy;
+var enemyParam;
+var enemyParams = [];
 var enemySpeedY = 1;
 var myHeight;
 var myWidth;
@@ -10,8 +12,12 @@ var numberOfCircles = 50;
 var isGameOver = false;
 var isHit = false;
 var enemies = [];
-var enemySpeeds = [];
-var enemySpeedsX = [];
+var lowerBoundEnemySpeedX = -1;
+var upperBoundEnemySpeedX = -5;
+var lowerBoundEnemySpeedY = -3;
+var upperBoundEnemySpeedY = 1;
+//var enemySpeeds = [];
+//var enemySpeedsX = [];
 var allBehind = false;
 var button;
 function preload() {
@@ -30,13 +36,14 @@ function setup() {
 	myHeight = windowHeight;
 	myWidth = windowWidth;
 	character = createSprite(myWidth / 2, myHeight - 67);
-	enemy = createSprite(myWidth + 10, random(myHeight / 2, myHeight - 67));
-	enemy.addAnimation("run", "./assets/enemy/sprite_0.png", "./assets/enemy/sprite_3.png");
-	enemy.scale += .5;
-	character.scale += .5;
+	enemyParam = new Enemy(myWidth + 10, random(myHeight / 2, myHeight - 67), random(lowerBoundEnemySpeedX,upperBoundEnemySpeedX), random(lowerBoundEnemySpeedY,upperBoundEnemySpeedY));
+	enemyParams.push(enemyParam);
+	enemy = createSprite(enemyParam.getW(), enemyParam.getH());
+    enemy.addAnimation("run", "../assets/enemy/sprite_0.png", "../assets/enemy/sprite_3.png");
+    enemy.scale += .5;
 	enemies.push(enemy);
-	enemySpeeds.push(random(1, 5));
-	enemySpeedsX.push(random(-3,1));
+	    
+	character.scale += .5;
 	character.addAnimation("run", "./assets/character/sprite_0.png", "./assets/character/sprite_5.png");
 }
 
@@ -44,7 +51,8 @@ function draw() {
 	fullscreen();
 	background(0, 0, 139);
 	showCircles();
-
+	moveEnemyByKeys();
+	
 	for (let i = 0; i < enemies.length; i++) {
 		enemies[i].changeAnimation("run");
 
@@ -101,14 +109,17 @@ function draw() {
 
 function addEnemy() {
 
-	enemy = createSprite(myWidth + 10, floor(random(myHeight / 2, (myHeight - 67))));
-
-	enemy.addAnimation("run", "./assets/enemy/sprite_0.png", "./assets/enemy/sprite_3.png");
-	enemy.scale += .5;
+	lowerBoundEnemySpeedX -= 1;
+	upperBoundEnemySpeedX -= 1;
+	lowerBoundEnemySpeedY -= 2;
+	upperBoundEnemySpeedY += 2;
+	enemyParam = new Enemy(myWidth + 10, random(myHeight / 2, myHeight - 67), random(lowerBoundEnemySpeedX,upperBoundEnemySpeedX), random(-3,1));
+	enemyParams.push(enemyParam);
+	enemy = createSprite(enemyParam.getW(), enemyParam.getH());
+    enemy.addAnimation("run", "../assets/enemy/sprite_0.png", "../assets/enemy/sprite_3.png");
+    enemy.scale += .5;
 	enemies.push(enemy);
-	enemySpeeds.push(random(1, 5));
-	enemySpeedsX.push(random(-3,-1));
-
+		
 }
 
 function showCircles() {
@@ -158,10 +169,27 @@ function moveEnemy() {
 	for (let i = 0; i < enemies.length; i++) {
 
 		if (enemies[i].position.y >= myHeight - 67 || enemies[i].position.y <= myHeight / 2) {
-			enemySpeeds[i] *= -1;
+			let tempSpeed = enemyParams[i].getSpeedY() * -1;
+			enemyParams[i].setSpeedY(tempSpeed);
 		}
-		enemies[i].velocity.x = enemySpeedsX[i];
-		enemies[i].velocity.y = enemySpeeds[i];
+		
+		
+		enemies[i].velocity.x = enemyParams[i].getSpeedX();
+		enemies[i].velocity.y = enemyParams[i].getSpeedY();
+
+		for (let k = i+1; k < enemies.length; k++) {
+			let enemyHit = collideRectRect(enemies[i].position.x, enemies[i].position.y, 32, 32, enemies[k].position.x, enemies[k].position.y, 32, 32);
+			if(enemyHit)
+			{
+				let tempSpeed = enemyParams[i].getSpeedY() * -1;
+				enemyParams[i].setSpeedY(tempSpeed);
+				enemyParams[i].setSpeedX(enemyParams[i].getSpeedX()-.1);
+			}
+		}
+
+		enemies[i].velocity.x = enemyParams[i].getSpeedX();
+		enemies[i].velocity.y = enemyParams[i].getSpeedY();
+
 	}
 }
 
@@ -191,8 +219,10 @@ function resetEnemies() {
 
 	for (let i = 0; i < enemies.length; i++) {
 		enemySpeedY = floor(random(1, 5));
-		enemySpeeds[i] = enemySpeedY;
-		enemySpeedsX[i] = floor(random(-3,-1));
+		enemyParams[i].setSpeedY(enemySpeedY);
+		enemyParams[i].setSpeedX(floor(random(-3,-1)));
+		//enemySpeeds[i] = enemySpeedY;
+		//enemySpeedsX[i] = floor(random(-3,-1));
 
 		enemies[i].position.x = myWidth + 50;
 		enemies[i].position.y = random(myHeight / 2, (myHeight - 67));
@@ -215,7 +245,7 @@ function mousePressed() {
 		}
 	} else if (mouseY >= 0 && mouseY < 100) {
 		//character.velocity.y -=.5;
-	} else {
+	} else { 
 		character.velocity.x = 0;
 		character.velocity.y = 0;
 	}
@@ -226,4 +256,40 @@ function mouseReleased() {
 	if (!isGameOver) {
 		character.velocity.y -= .5;
 	}
+}
+
+function moveEnemyByKeys()
+{
+	if(keyIsPressed)
+	{
+		
+		if(key =="w")
+		{
+			character.velocity.y -= 40;
+		}
+		else if(key =="a")
+		{
+			character.velocity.x -= .5;
+		}
+		else if(key =="d")
+		{
+			character.velocity.x += .5;
+		}
+		else if(key =="s")
+		{
+			character.velocity.y += .5;
+		}
+		else
+		{
+			character.velocity.x = 0;
+			character.velocity.y = 0;
+		}
+		
+	}
+	
+}
+function keyReleased() {
+	character.velocity.x = 0;
+	character.velocity.y = 0;
+
 }
