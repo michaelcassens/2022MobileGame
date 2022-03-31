@@ -20,6 +20,7 @@ var upperBoundEnemySpeedY = 1;
 //var enemySpeedsX = [];
 var allBehind = false;
 var button;
+var back, back2;
 function preload() {
 
 }
@@ -28,13 +29,21 @@ function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
 	myHeight = windowHeight;
 	myWidth = windowWidth;
+	let myBack = loadImage("assets/background.png");
+	back = new imageclass(myBack,0,0,myWidth, myHeight);
+	let myBack2 = loadImage("assets/background2.png");
+	back2 = new imageclass(myBack2,myWidth,0,myWidth, myHeight);
 }
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-
 	myHeight = windowHeight;
 	myWidth = windowWidth;
+	
+	let myBack = loadImage("assets/background.png");
+	back = new imageclass(myBack,0,0,myWidth, myHeight);
+	let myBack2 = loadImage("assets/background2.png");
+	back2 = new imageclass(myBack2,myWidth,0,myWidth, myHeight);
 	character = createSprite(myWidth / 2, myHeight - 67);
 	enemyParam = new Enemy(myWidth + 10, random(myHeight / 2, myHeight - 67), random(lowerBoundEnemySpeedX,upperBoundEnemySpeedX), random(lowerBoundEnemySpeedY,upperBoundEnemySpeedY));
 	enemyParams.push(enemyParam);
@@ -49,7 +58,22 @@ function setup() {
 
 function draw() {
 	fullscreen();
-	background(0, 0, 139);
+	background(120);
+	back.draw();
+	back.moveX(-1);
+	if(back.getX() <= -myWidth)
+	{
+		back.setX(myWidth);
+	}
+
+	back2.draw();
+	console.log(back2.getX());
+	back2.moveX(-1);
+	if(back2.getX() <= -myWidth)
+	{
+		back2.setX(myWidth);
+	}
+	
 	showCircles();
 	moveEnemyByKeys();
 	
